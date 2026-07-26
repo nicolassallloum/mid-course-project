@@ -44,6 +44,19 @@ def add_task(payload: TaskCreate) -> TaskResponse:
     return task
 
 
+def _matches_assignee(task: TaskResponse, assignee: Optional[str]) -> bool:
+    if not assignee:
+        return True
+    return (task.assignee or "").strip().casefold() == assignee.strip().casefold()
+
+
+def _matches_search(task: TaskResponse, query: Optional[str]) -> bool:
+    if not query or not query.strip():
+        return True
+    needle = query.strip().casefold()
+    return needle in task.title.casefold() or needle in task.description.casefold()
+
+
 def get_all_tasks(
     status: Optional[TaskStatus] = None,
     priority: Optional[TaskPriority] = None,
@@ -52,29 +65,16 @@ def get_all_tasks(
     overdue: Optional[bool] = None,
 ) -> list[TaskResponse]:
     tasks = [_refresh_overdue(task) for task in _tasks.values()]
-
-    if status is not None:
-        tasks = [task for task in tasks if task.status == status]
-    if priority is not None:
-        tasks = [task for task in tasks if task.priority == priority]
-    if assignee:
-        normalized_assignee = assignee.strip().casefold()
-        tasks = [
-            task
-            for task in tasks
-            if (task.assignee or "").strip().casefold() == normalized_assignee
-        ]
-    if q and q.strip():
-        needle = q.strip().casefold()
-        tasks = [
-            task
-            for task in tasks
-            if needle in task.title.casefold() or needle in task.description.casefold()
-        ]
-    if overdue is not None:
-        tasks = [task for task in tasks if task.is_overdue is overdue]
-
-    return sorted(tasks, key=lambda task: (task.created_at, task.id))
+    filtered = [
+        task
+        for task in tasks
+        if (status is None or task.status == status)
+        and (priority is None or task.priority == priority)
+        and _matches_assignee(task, assignee)
+        and _matches_search(task, q)
+        and (overdue is None or task.is_overdue is overdue)
+    ]
+    return sorted(filtered, key=lambda task: (task.created_at, task.id))
 
 
 def get_task_by_id(task_id: str) -> Optional[TaskResponse]:
