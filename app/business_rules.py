@@ -18,7 +18,7 @@ def validate_status_transition(current: TaskStatus, new: TaskStatus) -> None:
             {f"{from_status.value}->{to_status.value}" for from_status, to_status in VALID_TRANSITIONS}
         )
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=(
                 f"Invalid status transition from {current.value} to {new.value}. "
                 f"Allowed transitions: {allowed}"
