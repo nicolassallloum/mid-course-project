@@ -20,7 +20,7 @@
 - Dependency command: `python -m pip install -r requirements.txt`.
 - Test command used by CI: `python -m pytest tests/ -v`.
 - Shortcut check: no `continue-on-error`, no `|| true`, and pytest is not skipped.
-- Latest green run note: Task Tracker CI completed successfully on the `final-project` branch on 2026-08-06.
+- Latest green run note: Pending verification. No Task Tracker CI run has appeared yet.
 
 ## Docker evidence
 
