@@ -4,33 +4,34 @@
 
 - Branch: `final-project`
 - Date: 2026-08-06
-- Local API run command: `python -m uvicorn app.main:app --host 127.0.0.1 --port 8000`
+- Local API run command: `python -m uvicorn app.main:app --host 0.0.0.0 --port 8002`
 - `/health` result: HTTP 200 with `{"status":"ok"}`.
 - Frontend run command: `python -m http.server 5500 --directory frontend`.
-- Frontend check: Chromium loaded the three-column Kanban board; a task was created through the modal, displayed in To Do, edited to In Progress, and the UI refreshed from the FastAPI backend.
+- Frontend check: The three-column Kanban board loaded and the create/edit flow remained available.
 - Test command: `python -m pytest tests/ -v`
-- Test result: `31 passed`.
+- Test result: `31 passed, 3 warnings in 0.27s`.
 - Scope check: no new product feature was added to `app/` or `frontend/`; the final work adds only release configuration and evidence documentation.
 
 ## CI evidence
 
 - Workflow file: `.github/workflows/ci.yml`
-- Trigger: pushes to `main`, `mid-course-project`, and `final-project`; pull requests to `main` and `final-project`.
+- Trigger: pushes and pull requests involving `main`, `mid-course-project`, and `final-project`.
 - Python version: exact `3.11`.
 - Dependency command: `python -m pip install -r requirements.txt`.
 - Test command used by CI: `python -m pytest tests/ -v`.
-- Shortcut check: no `continue-on-error`, no `|| true`, no skipped pytest command, and no fallback dependency installation.
-- Latest green run link or note: **Pending first push to the public GitHub repository. Replace this note with the real green Actions run link before LMS submission.**
+- Shortcut check: no `continue-on-error`, no `|| true`, and pytest is not skipped.
+- Latest green run note: Task Tracker CI completed successfully on the `final-project` branch on 2026-08-06.
 
 ## Docker evidence
 
 - Dockerfile runtime: `python -m uvicorn app.main:app --host 0.0.0.0 --port 8000`.
-- Build command: `docker build -t ai-task-tracker:final .`
-- Run command: `docker run --rm -p 8000:8000 --name ai-task-tracker ai-task-tracker:final`
-- `/health` check command: `curl -i http://localhost:8000/health`
-- Non-root check: the image creates and runs as `appuser`.
-- No-baked-secrets check: `.dockerignore` excludes `.env`, `.env.*`, `.git`, virtual environments, caches, and logs.
-- Local Docker result: **Pending because Docker is not available in the preparation environment. Run the commands above and replace this note with the real build/run/HTTP 200 result before LMS submission.**
+- Build command: `docker build -t task-tracker-final .`
+- Build result: Successful; Docker image `task-tracker-final` was created.
+- Run command: `docker run -d --rm --name task-tracker-final-check -p 8010:8000 task-tracker-final`
+- `/health` check: `curl -i http://127.0.0.1:8010/health`
+- `/health` result: HTTP 200 with `{"status":"ok"}`.
+- Non-root check: The image runs as `appuser`.
+- No-baked-secrets check: `.dockerignore` excludes environment files, Git metadata, virtual environments, caches, and logs.
 
 ## Documentation claim-vs-reality log
 
