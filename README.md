@@ -1,83 +1,65 @@
-# AI-Assisted Task Tracker — Mid-Course Feature Extension Sprint
+# AI-Assisted Task Tracker
 
-This repository extends the Modules 1–3 FastAPI Task Tracker with two scoped, end-to-end features:
+This is the original FastAPI and vanilla-JavaScript Task Tracker used for the mid-course project, now extended only with final-course release-readiness and AI-ownership evidence.
 
-1. **Due dates + overdue filter**
-2. **Search + combined filters**
+The application keeps the mid-course features and architecture intact:
 
-The project preserves the original Module 2 backend rules and Module 3 Kanban workflow while adding visible frontend controls, backend validation/filtering, focused pytest coverage, Break Test evidence, and the required project documentation.
+1. Due dates and an overdue filter.
+2. Search with combined status, priority, assignee, and overdue filters.
+3. The original three-column Kanban board and validated status-transition rules.
 
-## Submission branch
+## Repository branches
 
-The submitted branch must be named exactly:
+- `main`: reconstructed baseline of the submitted mid-course Task Tracker.
+- `mid-course-project`: points to the same preserved mid-course baseline.
+- `final-project`: adds CI, Docker, repository guardrails, and final evidence documents without replacing the application.
 
-```bash
-git checkout -b mid-course-project
-```
-
-After extracting this project, initialize Git if needed, create that branch, commit the files, and push the branch to a **public** repository.
-
-## Features
-
-### Due dates + overdue filter
-
-- Optional `due_date` accepted by create and update operations.
-- ISO date validation through Pydantic.
-- Computed `is_overdue` value returned by the API.
-- A task is overdue when its due date is before today and its status is not `Done`.
-- `GET /tasks?overdue=true` returns overdue tasks only.
-- The create/edit modal includes a due-date field.
-- Cards display the due date and an **Overdue** pill when applicable.
-
-### Search + combined filters
-
-- `GET /tasks?q=...` searches title and description case-insensitively.
-- Search combines with `status`, `priority`, `assignee`, and `overdue` filters.
-- No matches return HTTP 200 with `[]`.
-- Invalid enum filters return HTTP 422.
-- The frontend provides search, status, priority, overdue, and clear-filter controls.
-- All three Kanban columns remain visible when a filter returns no cards for a column.
+> The uploaded ZIP files did not contain their original `.git` histories. The branch structure in this package was reconstructed from the actual mid-course source snapshot.
 
 ## Existing behavior preserved
 
-- `/health` endpoint.
-- Strict Pydantic v2 models and extra-field rejection.
-- In-memory storage.
-- Five CRUD endpoints.
-- Status-transition rules:
-  - `ToDo -> InProgress`
-  - `InProgress -> Done`
-  - `Done -> InProgress`
-- Invalid and same-status transitions return 422.
-- Loading, empty, ready, and error UI states.
-- Native drag-and-drop with PATCH persistence and rollback on rejection.
-- Create/edit modal with client title trimming and server error handling.
+- FastAPI backend in `app/`.
+- Vanilla HTML/CSS/JavaScript frontend in `frontend/index.html`.
+- In-memory task storage.
+- `GET /health` returning `{"status":"ok"}`.
+- Create, list, read, update, and delete task endpoints.
+- Strict Pydantic models and extra-field rejection.
+- Allowed transitions: `ToDo -> InProgress`, `InProgress -> Done`, and `Done -> InProgress`.
+- Due dates, computed overdue status, search, and combined filters.
+- Native drag-and-drop with server persistence and rollback on rejected transitions.
 
 ## Project structure
 
 ```text
+.github/workflows/ci.yml
+Dockerfile
+.dockerignore
+AGENTS.md
+README.md
 app/
-  main.py
-  models.py
-  storage.py
-  business_rules.py
 frontend/
-  index.html
 tests/
-  conftest.py
-  verify_a.py
-  test_tasks.py
-docs/midcourse/
-  user-stories.md
-  mini-adr.md
-  prompt-log.md
-  verification.md
-  reflection.md
+docs/
+  midcourse/
+  release-evidence.md
+  final-ai-review.md
+  ai-playbook.md
 ```
 
-## Run the backend
+## Final Project
 
-### 1. Create a virtual environment
+Branch reviewed: `final-project`
+
+### What this submission demonstrates
+
+- The existing Task Tracker remains within the intended course scope.
+- CI installs the declared dependencies and runs the full pytest suite on pushes and pull requests.
+- The Docker image starts the actual FastAPI application on port 8000 and defines a `/health` health check.
+- AI review, security review, correction decisions, and personal ownership rules are recorded in `docs/`.
+
+### How to run locally
+
+Create and activate a virtual environment.
 
 Windows PowerShell:
 
@@ -93,16 +75,11 @@ python -m venv .venv
 source .venv/bin/activate
 ```
 
-### 2. Install dependencies
+Install dependencies and start the API:
 
 ```bash
-pip install -r requirements.txt
-```
-
-### 3. Start FastAPI
-
-```bash
-uvicorn app.main:app --reload --port 8000
+python -m pip install -r requirements.txt
+python -m uvicorn app.main:app --reload --port 8000
 ```
 
 Verify:
@@ -110,62 +87,48 @@ Verify:
 - Health: `http://localhost:8000/health`
 - Swagger UI: `http://localhost:8000/docs`
 
-## Open the frontend
-
-In a second terminal:
+In a second terminal, serve the frontend:
 
 ```bash
 python -m http.server 5500 --directory frontend
 ```
 
-Open:
+Open `http://localhost:5500/index.html`.
 
-```text
-http://localhost:5500/index.html
-```
-
-The backend CORS configuration allows the local frontend origins used in the course workflow.
-
-## Run verification
-
-Model verification:
+### How to run tests
 
 ```bash
-python -m tests.verify_a
+python -m pytest tests/ -v
 ```
 
-Full pytest suite:
+The reconstructed final branch was verified with all 31 tests passing.
+
+### How to run with Docker
 
 ```bash
-pytest tests/ -v
+docker build -t ai-task-tracker:final .
+docker run --rm -p 8000:8000 --name ai-task-tracker ai-task-tracker:final
 ```
 
-Expected result in the prepared project:
+In another terminal:
 
-```text
-31 passed
+```bash
+curl -i http://localhost:8000/health
 ```
 
-## Five-minute final submission check
+Expected response body:
 
-Before pushing the public repository:
+```json
+{"status":"ok"}
+```
 
-1. Start the backend and frontend.
-2. Create a task with a past due date and confirm the Overdue pill appears.
-3. Use the overdue filter and confirm only overdue tasks remain.
-4. Search by title or description and combine it with priority or status.
-5. Drag `ToDo -> InProgress` and confirm the PATCH succeeds.
-6. Try `Done -> ToDo` and confirm the card reverts with the server message.
-7. Run `pytest tests/ -v` and save the output.
-8. Confirm the branch is `mid-course-project`.
-9. Confirm the repository is public and contains no secrets.
+### Evidence files
 
-## Documentation
+- `docs/release-evidence.md`
+- `docs/final-ai-review.md`
+- `docs/ai-playbook.md`
+- Existing mid-course evidence remains in `docs/midcourse/`.
 
-The required course evidence is in [`docs/midcourse/`](docs/midcourse/):
+### AI assistance summary
 
-- User stories and acceptance criteria
-- Mini-ADR
-- Prompt log
-- Verification and Break Test evidence
-- Reflection
+AI helped compare the two uploaded repository snapshots, identify that the React/Vite application was not the original course project, and draft the release configuration and evidence documents. I verified the actual FastAPI application by reviewing the diff, running the full pytest suite, starting the API, checking `/health`, and testing the frontend workflow in a browser. I rejected the suggestion implied by the separate generated repository to replace the original application with a React/Vite project.
