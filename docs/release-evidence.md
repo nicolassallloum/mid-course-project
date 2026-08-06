@@ -15,12 +15,14 @@
 ## CI evidence
 
 - Workflow file: `.github/workflows/ci.yml`
-- Trigger: pushes and pull requests involving `main`, `mid-course-project`, and `final-project`.
+- Trigger: pushes, pull requests, and manual workflow dispatch for `mid-course-project` and `final-project`.
 - Python version: exact `3.11`.
 - Dependency command: `python -m pip install -r requirements.txt`.
 - Test command used by CI: `python -m pytest tests/ -v`.
 - Shortcut check: no `continue-on-error`, no `|| true`, and pytest is not skipped.
-- Latest green run note: Pending verification. No Task Tracker CI run has appeared yet.
+- Verified green run: Task Tracker CI #3 completed successfully on the `final-project` branch on 2026-08-06.
+- Run link: https://github.com/nicolassallloum/mid-course-project/actions/runs/31126724895
+- Result: Repository checkout, Python setup, dependency installation, and the complete pytest suite succeeded.
 
 ## Docker evidence
 
